@@ -4,6 +4,6 @@ jobs:
   my-first-job:
     runs-on: ubuntu-latest
     steps:
-      - name: List files in the repository
+      - name: Say Hello
         run : |
           echo "Hello World"
