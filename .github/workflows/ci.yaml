@@ -10,6 +10,6 @@ jobs:
           echo "Hello World"
       - name: run python script
         run: |
-          pip install -r requirements.txt
+          pip install -r scripts/requirments
           python scripts/ci.py
 
