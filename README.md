@@ -2,4 +2,4 @@
 
 Repository for CI/CD for Machine Learning course.
 
-These are resources resources. 
+This repo contains resources for CI/CD. 
