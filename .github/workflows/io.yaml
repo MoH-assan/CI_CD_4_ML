@@ -1,0 +1,27 @@
+name: io
+on: [push]
+
+jobs:
+  io:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set-var #First step, set a variable and output it as GITHUB_OUTPUT env variable
+        id: set-var
+        shell: python
+        run: |
+          import os
+          print(f"The path to GITHUB_OUTPUT is: {os.environ['GITHUB_OUTPUT']}")
+          if os.path.exists(os.environ['GITHUB_OUTPUT']):
+            print(f'Currently the content of this file is:')
+            with open(os.environ['GITHUB_OUTPUT'], 'r') as f:
+              print(f.read())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            print(f'VAL=true', file=f)
+          print(f"The path to GITHUB_OUTPUT is: {os.environ['GITHUB_OUTPUT']}")
+          if os.path.exists(os.environ['GITHUB_OUTPUT']):
+            print(f'Currently the content of this file is:')
+            with open(os.environ['GITHUB_OUTPUT'], 'r') as f:
+              print(f.read())
+      - name: print value #Second step, print the variable
+        run: echo "the value is ${{ steps.set-var.outputs.VAL }}"
+    
