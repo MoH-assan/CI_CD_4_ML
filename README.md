@@ -26,5 +26,25 @@ env:
 
 13. Some Environment variables are available by default, and you can use them in the steps or Python code using os.getenv('VariableName'). e.g. CI is true when you are running in a GitHub Actions environment. So if the python file is run in a GitHub Actions environment, it will be true, but if run locally it will be false. 
 
-14. You can save the output of a step and use it in another step. For example in the io.yaml file, we save the output of the set-var step and use it in the print-value step. Note that you must give each step an id to be able to refer to it later and get its outputs. Note the the output is written to a file called GITHUB_OUTPUT and it is unique to each step. This is why the id is needed so you can recall the correct GITHUB_OUTPUT file. 
+14. You can save the output of a step and use it in another step. For example in the io.yaml file, we save the output of the set-var step and use it in the print-value step. Note that you must give each step an id to be able to refer to it later and get its outputs. Note that the output is written to a file called GITHUB_OUTPUT and it is unique to each step. This is why the id is needed so you can recall the correct GITHUB_OUTPUT file. 
 
+15. At the Branch protection rules section, the insturctor mentioned pytest package, smoke test and unit test, which I believe are core for traditional software CI/CD. 
+
+
+# Section 3: Testing ML code.
+
+pytest book: https://www.amazon.com/Python-Testing-pytest-Effective-Scalable/dp/1680508601
+
+Mamba: https://github.com/mamba-org/provision-with-micromamba
+
+Setup Python: https://github.com/actions/setup-python
+
+Checkout: https://github.com/actions/checkout
+
+Caching: https://github.com/actions/cache
+
+Advanced GitHub Code Search Beta: https://github.com/features/code-search
+
+16. Unit tests are tests that are run on a small piece of code, such as a function or a method. Smoke tests are tests that are the majority of code (i.e., entire training loop).
+
+17. pytest looks for functions starting with test_ and run them for testing. 
