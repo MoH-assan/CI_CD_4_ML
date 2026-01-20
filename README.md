@@ -26,7 +26,7 @@ env:
 
 13. Some Environment variables are available by default, and you can use them in the steps or Python code using os.getenv('VariableName'). e.g. CI is true when you are running in a GitHub Actions environment. So if the python file is run in a GitHub Actions environment, it will be true, but if run locally it will be false. 
 
-14. You can save the output of a step and use it in another step. For example in the io.yaml file, we save the output of the set-var step and use it in the print-value step. Note that you must give each step an id to be able to refer to it later and get its outputs. Note the the output is written to a file called GITHUB_OUTPUT and it is unique to each step. This is why the id is needed so you can recall the correct GITHUB_OUTPUT file. 
+14. You can save the output of a step and use it in another step. For example in the io.yaml file, we save the output of the set-var step and use it in the print-value step. Note that you must give each step an id to be able to refer to it later and get its outputs. Note that the output is written to a file called GITHUB_OUTPUT and it is unique to each step. This is why the id is needed so you can recall the correct GITHUB_OUTPUT file. 
 
 15. At the Branch protection rules section, the insturctor mentioned pytest package, smoke test and unit test, which I believe are core for traditional software CI/CD. 
 
