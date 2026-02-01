@@ -1,4 +1,4 @@
-"""Compare script - triggered on PR comment. Add your compare logic here."""
+"""Compare wandb runs - triggered on PR comment."""
 
 import os
 import wandb
