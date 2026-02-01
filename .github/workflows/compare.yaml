@@ -1,0 +1,39 @@
+name: Compare (on PR comment)
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write  # needed to post comments
+
+jobs:
+  compare:
+    if: (github.event.issue.pull_request != null) && contains(github.event.comment.body, '/wandb')
+    runs-on: ubuntu-latest
+    steps:
+      - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+        run: echo "PAYLOAD:\n${PAYLOAD}\n"
+        env:
+          PAYLOAD: ${{ toJSON(github.event) }}
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install ghapi wandb
+
+      - name: Run compare
+        run: python scripts/compare.py
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      PR_COMMENT: ${{ github.event.comment.body }}
+      PR_NUMBER: ${{ github.event.issue.number }}
+      PAYLOAD: ${{ toJSON(github.event) }}

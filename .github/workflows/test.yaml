@@ -2,7 +2,7 @@ name: "Unit & Smoke Tests - mamba"
 on:
   pull_request:
     paths:
-      - test-example/**
+      -   test-example/**
       
   workflow_dispatch:
 
@@ -19,11 +19,11 @@ jobs:
         uses: actions/checkout@main   
    
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: test-example/conda-environment.yaml
           environment-name: course
-          cache-env: true
+          cache-environment: true
           cache-downloads: true
           
       - run: |
