@@ -32,7 +32,6 @@ if __name__ == "__main__":
 
     # Validate WANDB_API_KEY before creating report (W&B keys are 40+ characters)
     wandb_key = os.environ.get("WANDB_API_KEY")
-    print(f"WANDB_API_KEY: {wandb_key}")
     if wandb_key and len(wandb_key) < 40:
         raise ValueError(
             f"WANDB_API_KEY invalid: API key must have 40+ characters, has {len(wandb_key)}. "
@@ -55,26 +54,51 @@ if __name__ == "__main__":
         ENTITY = wandb_owner
 
         wandb_api = wandb.Api()
-        base_wandb_run = wandb_api.run(f"{ENTITY}/{PROJECT}/{base_wandb_run_id}")
-        run = wandb_api.run(f"{ENTITY}/{PROJECT}/{wandb_run_id}")
-        base_run_name = base_wandb_run.name
-        run_name = run.name
-        print(f'Creating report for {base_run_name} and {run_name}')
-        report = wr.Report(
-            entity=ENTITY,
-            project=PROJECT,
-            title='Compare Runs'
-        )
-        pg = wr.PanelGrid(
-            runsets=[
-                wr.Runset(ENTITY, PROJECT, "Run Comparison", filters=f"Name in ['{base_run_name}', '{run_name}']")
-            ],
-            panels=[
-                wr.RunComparer(diff_only='split', layout={'w': 24, 'h': 15}),
-            ]
-        )
+        base_run = wandb_api.run(f"{ENTITY}/{PROJECT}/{base_wandb_run_id}")
+        new_run = wandb_api.run(f"{ENTITY}/{PROJECT}/{wandb_run_id}")
+        base_name, new_name = base_run.name, new_run.name
+        print(f"Creating diff table for {base_name} vs {new_name}")
 
-        report.blocks = report.blocks[:1] + [pg] + report.blocks[1:]
+        def _flatten(d, prefix=""):
+            out = {}
+            if not isinstance(d, dict):
+                return out
+            for k, v in list(d.items()):
+                key = f"{prefix}{k}" if prefix else k
+                if isinstance(v, dict) and v and all(isinstance(x, (str, int, float, bool, type(None))) for x in (list(v.values())[:5] or [None])):
+                    out.update(_flatten(v, f"{key}."))
+                elif isinstance(v, (str, int, float, bool)) or v is None:
+                    out[key] = v
+            return out
+
+        def _safe_summary(run):
+            try:
+                s = run.summary
+                return _flatten(dict(s)) if s else {}
+            except Exception:
+                return {}
+
+        base_cfg = _flatten(dict(base_run.config))
+        new_cfg = _flatten(dict(new_run.config))
+        base_sum = _safe_summary(base_run)
+        new_sum = _safe_summary(new_run)
+
+        all_keys = sorted(set(base_cfg.keys()) | set(new_cfg.keys()) | set(base_sum.keys()) | set(new_sum.keys()))
+        rows = []
+        for k in all_keys:
+            bv = base_cfg.get(k) or base_sum.get(k)
+            nv = new_cfg.get(k) or new_sum.get(k)
+            if bv != nv:
+                rows.append((k, str(bv) if bv is not None else "—", str(nv) if nv is not None else "—"))
+
+        table_md = "| Parameter | Base | New |\n|-----------|------|-----|\n"
+        table_md += "\n".join(f"| {r[0]} | {r[1]} | {r[2]} |" for r in rows) if rows else "| *No differences* | | |"
+
+        report = wr.Report(entity=ENTITY, project=PROJECT, title="Compare Runs")
+        report.blocks = [
+            wr.H2(text=f"{base_name} vs {new_name}"),
+            wr.MarkdownBlock(text=table_md),
+        ]
         report.save()
         report_url = report.url
         print(f"Report saved to {report_url}")
