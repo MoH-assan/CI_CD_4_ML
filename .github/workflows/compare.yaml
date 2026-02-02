@@ -6,8 +6,8 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
-  issues: write  # needed to post comments
+  pull-requests: write  # needed to post comments on PRs
+  issues: write
 
 jobs:
   compare:
@@ -37,4 +37,4 @@ jobs:
       PR_COMMENT: ${{ github.event.comment.body }}
       PR_NUMBER: ${{ github.event.issue.number }}
       PAYLOAD: ${{ toJSON(github.event) }}
-      
+

@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
     # Validate WANDB_API_KEY before creating report (W&B keys are 40+ characters)
     wandb_key = os.environ.get("WANDB_API_KEY")
+    print(f"WANDB_API_KEY: {wandb_key}")
     if wandb_key and len(wandb_key) < 40:
         raise ValueError(
             f"WANDB_API_KEY invalid: API key must have 40+ characters, has {len(wandb_key)}. "
@@ -83,8 +84,12 @@ if __name__ == "__main__":
             owner, repo = os.environ.get("GITHUB_REPOSITORY", "MoH-assan/CI_CD_4_ML").split("/")
             pr_num = int(PR_NUMBER)
             reply_body = f"Here's the comparison report: {report_url}"
-            api.issues.create_comment(owner=owner, repo=repo, issue_number=pr_num, body=reply_body)
-            print(f"Posted reply to PR #{pr_num}")
+            try:
+                api.issues.create_comment(owner=owner, repo=repo, issue_number=pr_num, body=reply_body)
+                print(f"Posted reply to PR #{pr_num}")
+            except Exception as e:
+                print(f"Could not post PR comment (403 may mean PR from fork - check repo workflow permissions): {e}")
+                print(f"Report URL: {report_url}")
         else:
             print("Skipping PR comment (local run - set GITHUB_TOKEN to post locally)")
 
