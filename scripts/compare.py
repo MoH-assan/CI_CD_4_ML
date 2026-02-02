@@ -25,11 +25,18 @@ if __name__ == "__main__":
         PR_NUMBER = os.environ.get("PR_NUMBER")
         PAYLOAD = json.loads(os.environ.get("PAYLOAD", "{}"))
         COMMENT = PAYLOAD["comment"]
-        wandb_api = wandb.Api(api_key=os.environ.get("WANDB_API_KEY"))
     
 
     PR_comment = COMMENT.get("body", "").strip()
     print(f"COMMENT: {PR_comment}")
+
+    # Validate WANDB_API_KEY before creating report (W&B keys are 40+ characters)
+    wandb_key = os.environ.get("WANDB_API_KEY")
+    if wandb_key and len(wandb_key) < 40:
+        raise ValueError(
+            f"WANDB_API_KEY invalid: API key must have 40+ characters, has {len(wandb_key)}. "
+            "Get a valid key from https://wandb.ai/authorize and set it in repo Secrets."
+        )
 
     # Parse /wandb/{owner}/{project}/{run_id} from comment
     # e.g. /wandb/ma-hassan/cicd-quickstart/yi4sittf
@@ -46,6 +53,7 @@ if __name__ == "__main__":
         PROJECT = wandb_project
         ENTITY = wandb_owner
 
+        wandb_api = wandb.Api()
         base_wandb_run = wandb_api.run(f"{ENTITY}/{PROJECT}/{base_wandb_run_id}")
         run = wandb_api.run(f"{ENTITY}/{PROJECT}/{wandb_run_id}")
         base_run_name = base_wandb_run.name
