@@ -25,6 +25,7 @@ if __name__ == "__main__":
         PR_NUMBER = os.environ.get("PR_NUMBER")
         PAYLOAD = json.loads(os.environ.get("PAYLOAD", "{}"))
         COMMENT = PAYLOAD["comment"]
+        wandb_api = wandb.Api(api_key=os.environ.get("WANDB_API_KEY"))
     
 
     PR_comment = COMMENT.get("body", "").strip()
@@ -45,8 +46,8 @@ if __name__ == "__main__":
         PROJECT = wandb_project
         ENTITY = wandb_owner
 
-        base_wandb_run = wandb.Api().run(f"{ENTITY}/{PROJECT}/{base_wandb_run_id}")
-        run = wandb.Api().run(f"{ENTITY}/{PROJECT}/{wandb_run_id}")
+        base_wandb_run = wandb_api.run(f"{ENTITY}/{PROJECT}/{base_wandb_run_id}")
+        run = wandb_api.run(f"{ENTITY}/{PROJECT}/{wandb_run_id}")
         base_run_name = base_wandb_run.name
         run_name = run.name
         print(f'Creating report for {base_run_name} and {run_name}')
